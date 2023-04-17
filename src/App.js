@@ -1,24 +1,50 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import Cookies from "js-cookie";
+import { Routes, Route, Navigate } from "react-router-dom";
+
+import NotFound from "./components/404";
+import Login from "./components/Login";
+import Home from "./components/Home";
+import Layout from "./layout/Layout";
 
 function App() {
+  function LoginRoute(props) {
+    if (Cookies.get("token") !== undefined) {
+      return <Navigate to={"/"} />;
+    } else if (Cookies.get("token") === undefined) {
+      return props.children;
+    }
+  }
+
+  const UserRoute = (props) => {
+    if (Cookies.get("token") === undefined) {
+      return <Navigate to={"/login"} />;
+    }
+    return props.children;
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <UserRoute>
+            <Layout>
+              <Home />
+            </Layout>
+          </UserRoute>
+        }
+      />
+      <Route
+        path="/login"
+        element={
+          <LoginRoute>
+            <Login />
+          </LoginRoute>
+        }
+      />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 
